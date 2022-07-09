@@ -120,6 +120,32 @@ func (d *Driver) Read(collection, resource string, v interface{}) error {
 	return json.Unmarshal(b, &v)
 }
 
+func (d *Driver) ReadAll(collection string) ([]string, error) {
+
+	if collection == "" {
+		return nil, fmt.Errorf("Missing collection - unable to read")
+	}
+	dir := filepath.Join(d.dir, collection)
+
+	if _, err := stat(dir); err != nil {
+		return nil, err
+	}
+
+	files, _ := ioutil.ReadDir(dir)
+
+	var records []string
+
+	for _, file := range files {
+		b, err := ioutil.ReadFile(filepath.Join(dir, file.Name()))
+		if err != nil {
+			return nil, err
+		}
+
+		records = append(records, string(b))
+	}
+	return records, nil
+}
+
 func stat(path string) (fi os.FileInfo, err error) {
 	if fi, err = os.Stat(path); os.IsNotExist(err) {
 		fi, err = os.Stat(path + ".json")
