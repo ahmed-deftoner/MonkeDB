@@ -103,6 +103,20 @@ func stat(path string) (fi os.FileInfo, err error) {
 	return
 }
 
+func (d *Driver) getOrCreateMutex(collection string) *sync.Mutex {
+
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+	m, ok := d.mutexes[collection]
+
+	if !ok {
+		m = &sync.Mutex{}
+		d.mutexes[collection] = m
+	}
+
+	return m
+}
+
 type Address struct {
 	City    string
 	State   string
