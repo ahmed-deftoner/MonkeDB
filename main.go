@@ -36,4 +36,39 @@ func main() {
 		{"Neo", "31", "23344333", "Remote-Teams", Address{"bangalore", "karnataka", "india", "410013"}},
 		{"Albert", "32", "23344333", "Dominate", Address{"bangalore", "karnataka", "india", "410013"}},
 	}
+
+	for _, value := range employees {
+		db.Write("users", value.Name, User{
+			Name:    value.Name,
+			Age:     value.Age,
+			Contact: value.Contact,
+			Company: value.Company,
+			Address: value.Address,
+		})
+	}
+
+	records, err := db.ReadAll("users")
+	if err != nil {
+		fmt.Println("Error", err)
+	}
+	fmt.Println(records)
+
+	allusers := []User{}
+
+	for _, f := range records {
+		employeeFound := User{}
+		if err := json.Unmarshal([]byte(f), &employeeFound); err != nil {
+			fmt.Println("Error", err)
+		}
+		allusers = append(allusers, employeeFound)
+	}
+	fmt.Println((allusers))
+
+	// if err := db.Delete("users", "John"); err != nil {
+	// 	fmt.Println("Error", err)
+	// }
+
+	if err := db.Delete("users", ""); err != nil {
+		fmt.Println("Error", err)
+	}
 }
